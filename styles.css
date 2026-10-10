@@ -16,26 +16,63 @@ header h1 { margin: 0; font-size: 22px; }
 
 /* Обновленный контейнер карты */
 .map-container { 
-    position: relative; width: 100%; max-width: 1200px; height: 800px; 
-    margin: 20px auto; background: #e5e7eb; box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-    overflow: hidden; border-radius: 8px; border: 1px solid #ddd; 
-    touch-action: none; /* Отключаем системные свайпы для корректной работы JS-жестов */
+    position: relative; 
+    width: 100%; 
+    max-width: 1200px; 
+    height: 75vh; /* Универсальная высота для телефонов и ПК */
+    min-height: 500px;
+    max-height: 800px;
+    margin: 20px auto; 
+    background: #e5e7eb; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+    overflow: hidden; 
+    border-radius: 8px; 
+    border: 1px solid #ddd; 
+    touch-action: none; /* Блокировка системных жестов */
 }
 
-/* Обертка, которая двигается и масштабируется */
+/* Слой трансформаций, растянутый на 100% окна */
 #map-transform-wrapper {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    transform-origin: 0 0; /* Масштабируем от левого верхнего угла для точного расчета координат */
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    transform-origin: 0 0; 
     will-change: transform;
+    display: flex; /* Центрируем контент */
+    align-items: center; 
+    justify-content: center;
 }
 
+/* Корсет, который ужимается строго по размеру картинки */
+#image-bounds {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    max-height: 100%;
+    line-height: 0; /* Убирает лишний пиксельный отступ снизу */
+    box-shadow: 0 0 15px rgba(0,0,0,0.1); /* Легкая тень самой карты */
+}
+
+/* Картинка, задающая физический размер */
 #map-image {
-    display: block; width: 100%; height: 100%; object-fit: contain;
-    pointer-events: none; /* Запрещаем браузеру выделять картинку при долгом нажатии */
+    display: block; 
+    max-width: 100%; 
+    max-height: 100%; 
+    width: auto; 
+    height: auto; 
+    pointer-events: none; 
 }
 
+/* Слой точек накладывается ровно на корсет #image-bounds */
 #points-layer { 
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    pointer-events: none; 
 }
 
 /* Стили точек */

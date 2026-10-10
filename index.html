@@ -24,10 +24,13 @@
     </header>
     
     <div class="map-container" id="map-container">
-        <!-- Обертка для трансформаций: масштабирования и перемещения -->
+        <!-- Внешний враппер для зума и панорамирования -->
         <div id="map-transform-wrapper">
-            <img id="map-image" src="" alt="Карта" />
-            <div id="points-layer"></div>
+            <!-- Внутренний враппер (корсет), который ЖЕСТКО облегает картинку -->
+            <div id="image-bounds">
+                <img id="map-image" src="" alt="Карта" />
+                <div id="points-layer"></div>
+            </div>
         </div>
         
         <div id="popup" class="popup hidden">
