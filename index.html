@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1024">
     <title>Интерактивная карта - Каталог</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -23,22 +23,20 @@
         </div>
     </header>
     
-    <div class="map-container-wrapper">
-        <div class="map-container" id="map-container">
-            <div class="map-background" id="map-background"></div>
-            <div id="points-layer"></div>
-            
-            <div id="popup" class="popup hidden">
-                <button class="close-btn" onclick="closePopup()">×</button>
-                <h2 id="popup-title">Название</h2>
-                <div class="popup-section">
-                    <h3>Имена и Семьи:</h3>
-                    <div id="popup-buried"></div>
-                </div>
-                <div class="popup-section">
-                    <h3>Предметы искусства:</h3>
-                    <div id="popup-art"></div>
-                </div>
+    <div class="map-container" id="map-container">
+        <div class="map-background" id="map-background"></div>
+        <div id="points-layer"></div>
+        
+        <div id="popup" class="popup hidden">
+            <button class="close-btn" onclick="closePopup()">×</button>
+            <h2 id="popup-title">Название</h2>
+            <div class="popup-section">
+                <h3>Имена и Семьи:</h3>
+                <div id="popup-buried"></div>
+            </div>
+            <div class="popup-section">
+                <h3>Предметы искусства:</h3>
+                <div id="popup-art"></div>
             </div>
         </div>
     </div>

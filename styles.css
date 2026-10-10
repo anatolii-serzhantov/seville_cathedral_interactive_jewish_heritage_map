@@ -14,34 +14,26 @@ header h1 { margin: 0; font-size: 22px; }
 .edit-link:hover { background: #f59e0b; }
 .hidden { display: none !important; }
 
-/* Обертка для скроллинга на мобильных */
-.map-container-wrapper {
-    width: 100%;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-/* Контейнер с фиксированными пропорциями для десктопов и мобильных */
+/* Контейнер карты */
 .map-container { 
     position: relative; 
-    width: 1200px; /* Фиксированная ширина */
-    height: 800px; /* Фиксированная высота */
-    margin: 0 auto; 
+    width: 100%; 
+    max-width: 1200px; 
+    min-width: 1024px; /* Защита от сжатия на телефоне */
+    height: 800px; 
+    margin: 20px auto; 
     background: white; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+    overflow: hidden; 
     border-radius: 8px; 
-    border: 1px solid #ddd;
-    flex-shrink: 0; /* Чтобы контейнер не сжимался */
+    border: 1px solid #ddd; 
 }
 
-/* Фон карты */
 .map-background { 
     width: 100%; height: 100%; 
     background-color: #e5e7eb; 
     display: flex; align-items: center; justify-content: center; 
-    background-size: cover; /* Важное изменение: cover вместо contain */
+    background-size: contain; 
     background-position: center; 
     background-repeat: no-repeat;
 }
@@ -87,11 +79,3 @@ header h1 { margin: 0; font-size: 22px; }
 .popup-section ul { padding-left: 20px; margin: 10px 0; list-style-type: disc; }
 .popup-section ol { padding-left: 20px; margin: 10px 0; list-style-type: decimal; }
 .popup-section li { margin-bottom: 5px; }
-
-/* Медиазапросы для мобильных устройств - улучшение отображения */
-@media (max-width: 768px) {
-    .map-container-wrapper { padding: 0; }
-    .map-container { border-radius: 0; border: none; }
-    header { padding: 10px 15px; }
-    header h1 { font-size: 18px; }
-}
