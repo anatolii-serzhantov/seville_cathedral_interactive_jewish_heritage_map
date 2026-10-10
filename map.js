@@ -97,10 +97,11 @@ function initPanAndZoom() {
         const w = mapContainer.clientWidth;
         const h = mapContainer.clientHeight;
 
-        // Жесткий ограничитель, чтобы карта не уезжала за пределы экрана
+        // Жесткий ограничитель, чтобы карта не уезжала далеко за пределы экрана
         const minX = w - (w * scale);
         const minY = h - (h * scale);
 
+        // Позволяем чуть-чуть выходить за края для удобства, но возвращаем обратно
         pointX = Math.min(Math.max(pointX, minX), 0);
         pointY = Math.min(Math.max(pointY, minY), 0);
 
@@ -109,6 +110,7 @@ function initPanAndZoom() {
 
     // --- Обработка мобильных жестов (Тач) ---
     mapContainer.addEventListener('touchstart', (e) => {
+        if (e.target.closest('.popup')) return; // <--- ПРОПУСКАЕМ НАЖАТИЯ В ПОПАПЕ
         if (draggedDot && isEditMode) return;
         const rect = mapContainer.getBoundingClientRect();
         
@@ -132,8 +134,9 @@ function initPanAndZoom() {
     }, {passive: false});
 
     mapContainer.addEventListener('touchmove', (e) => {
+        if (e.target.closest('.popup')) return; // <--- РАЗРЕШАЕМ СКРОЛЛ В ПОПАПЕ
         if (draggedDot && isEditMode) return;
-        e.preventDefault(); // Блокируем системный скролл
+        e.preventDefault(); // Блокируем системный скролл только для карты
         const rect = mapContainer.getBoundingClientRect();
 
         if (e.touches.length === 2) {
@@ -164,6 +167,7 @@ function initPanAndZoom() {
     }, {passive: false});
 
     mapContainer.addEventListener('touchend', (e) => {
+        if (e.target.closest('.popup')) return;
         if (e.touches.length < 2) {
             if (e.touches.length === 1) {
                  startX = e.touches[0].clientX - pointX;
@@ -176,6 +180,7 @@ function initPanAndZoom() {
 
     // --- Обработка мыши на ПК ---
     mapContainer.addEventListener('wheel', (e) => {
+        if (e.target.closest('.popup')) return; // <--- РАЗРЕШАЕМ СКРОЛЛ МЫШЬЮ В ПОПАПЕ
         e.preventDefault();
         const rect = mapContainer.getBoundingClientRect();
         
@@ -196,6 +201,7 @@ function initPanAndZoom() {
     }, {passive: false});
 
     mapContainer.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.popup')) return;
         if (isEditMode && draggedDot) return;
         panning = true;
         startX = e.clientX - pointX;
@@ -203,6 +209,7 @@ function initPanAndZoom() {
     });
 
     mapContainer.addEventListener('mousemove', (e) => {
+        if (e.target.closest('.popup')) return;
         if (!panning || (isEditMode && draggedDot)) return;
         pointX = e.clientX - startX;
         pointY = e.clientY - startY;
