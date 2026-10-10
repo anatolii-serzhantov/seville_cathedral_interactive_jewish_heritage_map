@@ -3,6 +3,14 @@ let isEditMode = false;
 let draggedPoint = null;
 let draggedDot = null;
 
+// Переменные для зума и панорамирования
+let scale = 1;
+let pointX = 0, pointY = 0;
+let startX = 0, startY = 0;
+let panning = false;
+let pinchStartDist = 0;
+let startScale = 1;
+
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof mapData === 'undefined') {
         alert("Ошибка: Файл данных mapData.js не загрузился.");
@@ -32,22 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const container = document.getElementById('map-background');
-    
-    document.addEventListener('mousemove', (e) => {
-        if (!isEditMode || !draggedDot) return;
-        updateDotPosition(e.clientX, e.clientY);
-    });
-
-    document.addEventListener('touchmove', (e) => {
-        if (!isEditMode || !draggedDot) return;
-        e.preventDefault(); 
-        const touch = e.touches[0];
-        updateDotPosition(touch.clientX, touch.clientY);
-    }, {passive: false});
+    // Логика перемещения точек в режиме редактирования
+    const mapTransformWrapper = document.getElementById('map-transform-wrapper');
 
     function updateDotPosition(clientX, clientY) {
-        const rect = container.parentElement.getBoundingClientRect(); 
+        const rect = mapTransformWrapper.getBoundingClientRect(); 
+        // Рассчитываем процент с учетом текущего зума (rect учитывает transform: scale)
         let x = ((clientX - rect.left) / rect.width) * 100;
         let y = ((clientY - rect.top) / rect.height) * 100;
         
@@ -61,6 +59,17 @@ document.addEventListener('DOMContentLoaded', () => {
         draggedPoint.y = parseFloat(y.toFixed(2));
     }
 
+    document.addEventListener('mousemove', (e) => {
+        if (!isEditMode || !draggedDot) return;
+        updateDotPosition(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!isEditMode || !draggedDot) return;
+        e.preventDefault(); 
+        updateDotPosition(e.touches[0].clientX, e.touches[0].clientY);
+    }, {passive: false});
+
     const stopDragging = () => {
         if (draggedDot) {
             draggedDot.classList.remove('dragging');
@@ -71,8 +80,98 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('mouseup', stopDragging);
     document.addEventListener('touchend', stopDragging);
 
+    initPanAndZoom();
+
     if(mapData.length > 0) loadMap(0);
 });
+
+// Настройка зума и перемещения карты
+function initPanAndZoom() {
+    const mapContainer = document.getElementById('map-container');
+    const mapTransformWrapper = document.getElementById('map-transform-wrapper');
+
+    function setTransform() {
+        // Ограничиваем сдвиг, чтобы карта не улетала за экран
+        mapTransformWrapper.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+    }
+
+    // --- Обработка мобильных жестов (Тач) ---
+    mapContainer.addEventListener('touchstart', (e) => {
+        if (draggedDot && isEditMode) return;
+        
+        if (e.touches.length === 2) {
+            panning = false;
+            pinchStartDist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            startScale = scale;
+        } else if (e.touches.length === 1) {
+            panning = true;
+            startX = e.touches[0].clientX - pointX;
+            startY = e.touches[0].clientY - pointY;
+        }
+    }, {passive: false});
+
+    mapContainer.addEventListener('touchmove', (e) => {
+        if (draggedDot && isEditMode) return;
+        e.preventDefault(); // Блокируем скролл страницы браузером
+
+        if (e.touches.length === 2) {
+            const dist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            // Масштаб от 1 до 5
+            scale = Math.min(Math.max(1, startScale * (dist / pinchStartDist)), 5);
+            setTransform();
+        } else if (e.touches.length === 1 && panning) {
+            pointX = e.touches[0].clientX - startX;
+            pointY = e.touches[0].clientY - startY;
+            setTransform();
+        }
+    }, {passive: false});
+
+    mapContainer.addEventListener('touchend', (e) => {
+        if (e.touches.length < 2) {
+            if (e.touches.length === 1) {
+                 startX = e.touches[0].clientX - pointX;
+                 startY = e.touches[0].clientY - pointY;
+            } else {
+                 panning = false;
+            }
+        }
+    });
+
+    // --- Обработка десктопной мыши (Скролл и Перетаскивание) ---
+    mapContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const xs = (e.clientX - pointX) / scale;
+        const ys = (e.clientY - pointY) / scale;
+        const delta = (e.wheelDelta ? e.wheelDelta : -e.deltaY);
+        (delta > 0) ? (scale *= 1.2) : (scale /= 1.2);
+        scale = Math.min(Math.max(1, scale), 5); // Ограничения масштаба
+        pointX = e.clientX - xs * scale;
+        pointY = e.clientY - ys * scale;
+        setTransform();
+    }, {passive: false});
+
+    mapContainer.addEventListener('mousedown', (e) => {
+        if (isEditMode && draggedDot) return;
+        panning = true;
+        startX = e.clientX - pointX;
+        startY = e.clientY - pointY;
+    });
+
+    mapContainer.addEventListener('mousemove', (e) => {
+        if (!panning || (isEditMode && draggedDot)) return;
+        pointX = e.clientX - startX;
+        pointY = e.clientY - startY;
+        setTransform();
+    });
+
+    window.addEventListener('mouseup', () => { panning = false; });
+}
 
 window.switchMap = function(index) {
     loadMap(parseInt(index));
@@ -82,7 +181,12 @@ function loadMap(index) {
     currentMapIndex = index;
     const mapInfo = mapData[currentMapIndex];
     
-    document.getElementById('map-background').style.backgroundImage = `url('${mapInfo.image}')`;
+    // Загружаем картинку в <img>
+    document.getElementById('map-image').src = mapInfo.image;
+    
+    // Сбрасываем позицию карты
+    scale = 1; pointX = 0; pointY = 0;
+    document.getElementById('map-transform-wrapper').style.transform = `translate(0px, 0px) scale(1)`;
     
     const pointsLayer = document.getElementById('points-layer');
     pointsLayer.innerHTML = '';
@@ -113,6 +217,7 @@ function loadMap(index) {
 
         dot.addEventListener('touchstart', (e) => {
             if (!isEditMode) return;
+            e.stopPropagation(); // Не сдвигать карту при захвате точки
             draggedPoint = point;
             draggedDot = dot;
             dot.classList.add('dragging');
