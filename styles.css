@@ -104,6 +104,25 @@ header h1 { margin: 0; font-size: 22px; }
     transition: none; 
 }
 
+/* Адаптация для мобильных устройств (экраны уже 768px) */
+@media (max-width: 768px) {
+    .map-point { 
+        width: 20px; /* Уменьшено на ~30% (было 28px) */
+        height: 20px; 
+        font-size: 9px; /* Чуть уменьшаем шрифт, чтобы цифры влезали */
+        border-width: 1.5px; /* Делаем обводку чуть тоньше */
+    }
+    
+    /* Сохраняем правильное масштабирование при касании/нажатии на мобилке */
+    .map-point:active, .map-point:hover {
+        transform: translate(-50%, -50%) scale(1.3);
+    }
+    
+    .map-point.dragging {
+        transform: translate(-50%, -50%) scale(1.5);
+    }
+}
+
 /* Стили попапа */
 .popup { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.3); width: 90%; max-width: 600px; max-height: 85%; overflow-y: auto; z-index: 100; pointer-events: auto; }
 .popup.hidden { display: none; }
@@ -116,3 +135,4 @@ header h1 { margin: 0; font-size: 22px; }
 .popup-section ul { padding-left: 20px; margin: 10px 0; list-style-type: disc; }
 .popup-section ol { padding-left: 20px; margin: 10px 0; list-style-type: decimal; }
 .popup-section li { margin-bottom: 5px; }
+
