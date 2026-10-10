@@ -551,8 +551,8 @@ const mapData = [
             {
                 "id": "072",
                 "name": "Puerta de la Granada",
-                "x": 45.31,
-                "y": 42.14,
+                "x": 34.92,
+                "y": 17.66,
                 "buried": "",
                 "art": "<!--StartFragment-->В тимпане над этими воротами помещена скульптурная композиция XV века <strong>«Богоматерь Успокоения с царями Давидом и Соломоном»</strong> (<em>Our Lady of Repose with David and Solomon</em>), приписываемая Лоренсо Меркаданте де Бретань либо Педро Мильяну<!--EndFragment-->"
             }
